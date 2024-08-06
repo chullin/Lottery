@@ -1,0 +1,76 @@
+import tkinter as tk
+from tkinter import messagebox, simpledialog, font
+
+class LotteryApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("抽籤應用程式")
+        self.root.geometry("350x500")  # 設置視窗寬高為 400x400
+
+        self.entries = []
+
+        # 設置字體
+        self.font = font.Font(size=16)
+
+        self.label = tk.Label(root, text="輸入工號和名字", font=self.font)
+        self.label.pack()
+
+        self.entry_id = tk.Entry(root, font=self.font)
+        self.entry_id.pack(pady=5)
+        self.entry_id.insert(0, "工號")
+
+        self.entry_name = tk.Entry(root, font=self.font)
+        self.entry_name.pack(pady=5)
+        self.entry_name.insert(0, "名字")
+
+        self.add_button = tk.Button(root, text="添加", font=self.font, command=self.add_entry)
+        self.add_button.pack(pady=5)
+
+        self.listbox = tk.Listbox(root, font=self.font)
+        self.listbox.pack(pady=5)
+
+        self.delete_button = tk.Button(root, text="刪除選中的", font=self.font, command=self.delete_entry)
+        self.delete_button.pack(pady=5)
+
+        self.draw_button = tk.Button(root, text="隨機選擇一個人", font=self.font, command=self.draw_lottery)
+        self.draw_button.pack(pady=5)
+
+    def add_entry(self):
+        employee_id = self.entry_id.get()
+        employee_name = self.entry_name.get()
+        if employee_id and employee_name:
+            self.entries.append((employee_id, employee_name))
+            self.listbox.insert(tk.END, f"{employee_id} - {employee_name}")
+            self.entry_id.delete(0, tk.END)
+            self.entry_name.delete(0, tk.END)
+        else:
+            messagebox.showwarning("輸入錯誤", "請輸入工號和名字")
+
+    def delete_entry(self):
+        selected = self.listbox.curselection()
+        if selected:
+            index = selected[0]
+            self.listbox.delete(index)
+            del self.entries[index]
+        else:
+            messagebox.showwarning("刪除錯誤", "請選擇要刪除的條目")
+
+    def draw_lottery(self):
+        if self.entries:
+            import random
+            selected = random.choice(self.entries)
+            self.entries.remove(selected)
+            self.update_listbox()
+            messagebox.showinfo("抽籤結果", f"抽中的人是：{selected[1]} ({selected[0]})")
+        else:
+            messagebox.showwarning("抽籤錯誤", "沒有可選擇的人")
+
+    def update_listbox(self):
+        self.listbox.delete(0, tk.END)
+        for entry in self.entries:
+            self.listbox.insert(tk.END, f"{entry[0]} - {entry[1]}")
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = LotteryApp(root)
+    root.mainloop()
